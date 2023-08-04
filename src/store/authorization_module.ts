@@ -1,5 +1,5 @@
 import {ActionContext} from "vuex";
-import {Credentials} from "@/domain/entities/Credentials";
+import {Credentials} from "@/domain/entities/credentials";
 import {loginUseCase} from "@/usecases/login_usecase";
 import {User} from "@/domain/entities/user";
 import {getItemLocalStorageUseCase} from "@/usecases/get_item_localstorage_usecase";
@@ -21,9 +21,14 @@ const mutations = {
 
 const actions = {
   login: async ({commit}: ActionContext<AuthorizationState, AuthorizationState>, credentials: Credentials) => {
-    const user: User = await login(credentials);
-    persistUserOnLocalStorage(user);
-    commit("SET_USER", user);
+    try {
+      const user: User = await login(credentials);
+      persistUserOnLocalStorage(user);
+      commit("SET_USER", user);
+    } catch (e) {
+      console.log("[actions] Error login ", e);
+      throw e;
+    }
   },
 };
 
@@ -31,13 +36,13 @@ const login = async (credentials: Credentials): Promise<User> => {
   try {
     return await loginUseCase.Execute(credentials);
   } catch (e) {
-    console.log("[actions] Error login ", e)
+    console.log("[login] Error loginUseCase.Execute ", e);
     throw e;
   }
 }
 
 const persistUserOnLocalStorage = (user: User): void => {
-  setItemLocalStorageUseCase.Execute(userKeyLocalStorage, JSON.stringify(user))
+  setItemLocalStorageUseCase.Execute(userKeyLocalStorage, JSON.stringify(user));
 }
 
 const getters = {

@@ -21,6 +21,7 @@ import {defineComponent, ref} from 'vue';
 import ContainerView from "@/components/ContainerView.vue";
 import InputView from "@/components/InputView.vue";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 
 export default defineComponent({
@@ -30,14 +31,16 @@ export default defineComponent({
   setup() {
     const email = ref("");
     const password = ref("");
+
     const store = useStore();
+    const router = useRouter();
 
     const onSubmit = async (): Promise<void> => {
       try {
         await login();
+        await router.push({name: "rooms"});
       } catch (e) {
         console.log("[onSubmit] Error login ", e);
-        alert(e);
       }
     };
 

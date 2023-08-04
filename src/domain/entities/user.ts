@@ -1,7 +1,5 @@
-import {Credentials} from "@/domain/entities/Credentials";
-
 export type User = {
+  id: number,
   name: string,
   image: null | string,
-  credentials: Credentials
 }

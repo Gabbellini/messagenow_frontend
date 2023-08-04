@@ -1,4 +1,4 @@
-import {Credentials} from "@/domain/entities/Credentials";
+import {Credentials} from "@/domain/entities/credentials";
 import {loginRepository} from "@/repositories/login_repository";
 import {User} from "@/domain/entities/user";
 

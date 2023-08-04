@@ -8,9 +8,10 @@ const routes: Array<RouteRecordRaw> = [
     component: LoginView
   },
   {
-    path: '/home',
-    name: 'home',
-    component: () => import('../views/HomeView.vue')
+    path: '/rooms/:roomID?',
+    name: 'rooms',
+    props: true,
+    component: () => import('../views/HomeView.vue'),
   }
 ]
 

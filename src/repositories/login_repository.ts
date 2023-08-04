@@ -1,5 +1,5 @@
-import {Credentials} from "@/domain/entities/Credentials";
-import http from "@/repositories/axios";
+import {Credentials} from "@/domain/entities/credentials";
+import {http} from "@/repositories/http";
 import {User} from "@/domain/entities/user";
 
 interface LoginRepository {
