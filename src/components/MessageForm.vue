@@ -35,7 +35,7 @@ export default defineComponent({
 
     const sendMessage = async (): Promise<void> => {
       try {
-        await store.dispatch("room_module/sendMessage", {roomID: props.roomID, text: text});
+        await store.dispatch("room_module/sendMessage", {roomID: props.roomID, message: text});
       } catch (e) {
         console.log("[onSubmit] Error dispatch ", e);
       }

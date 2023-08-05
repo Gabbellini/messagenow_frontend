@@ -9,7 +9,7 @@ interface LoginRepository {
 class LoginRepositoryImpl implements LoginRepository {
   async Execute(credentials: Credentials): Promise<User> {
     try {
-      const { data } = await http.post("/api/login", credentials, {
+      const { data } = await http.post("/login", credentials, {
         withCredentials: false,
       })
       return data;

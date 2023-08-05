@@ -8,7 +8,7 @@ interface LoadRoomsRepository {
 class LoadRoomsRepositoryImpl implements LoadRoomsRepository {
   async Execute(): Promise<Room[]> {
     try {
-      const response = await http.get("/api/rooms")
+      const response = await http.get("/rooms")
       return response.data;
     } catch (e) {
       console.log("[LoadRoomsRepositoryImpl] Error post ", e)

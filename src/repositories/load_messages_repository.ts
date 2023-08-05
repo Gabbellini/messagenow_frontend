@@ -9,7 +9,7 @@ interface LoadMessagesRepository {
 class LoadMessagesRepositoryImpl implements LoadMessagesRepository {
   async Execute(roomID: number): Promise<Message[]> {
     try {
-      const response = await http.get(`/api/rooms/${roomID}/messages`);
+      const response = await http.get(`/rooms/${roomID}/messages`);
       return response.data;
     } catch (e) {
       console.log("[LoadMessagesRepositoryImpl] Error post ", e)
