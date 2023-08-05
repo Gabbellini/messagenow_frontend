@@ -1,6 +1,6 @@
 <template>
   <ol class="rooms">
-    <li @click="onClick(index, room)" class="room" v-for="(room, index) of rooms" :key="`room-${index}`">
+    <li @click="onClick(room)" class="room" v-for="(room, index) of rooms" :key="`room-${index}`">
       <h2>Participantes</h2>
       <ul class="room__users">
         <li class="room__user" v-for="(user, index) of room.users" :key="`user-${index}`">
@@ -45,9 +45,9 @@ export default defineComponent({
     const rooms: ComputedRef<Room[]> = computed(() =>
         store.getters["room_module/rooms"]);
 
-    const onClick = async (index: number, room: Room): Promise<void> => {
+    const onClick = async (room: Room): Promise<void> => {
       try {
-        await router.push({name: "rooms", params: {roomID: room.id}})
+        await router.push({name: "rooms", params: {roomID: room.id}});
       } catch (e) {
         console.log("[onClick] Error loadRoom ", e);
         alert(e);
@@ -65,11 +65,9 @@ export default defineComponent({
 <style scoped>
 .rooms {
   width: 40%;
-  background-image: url("../../src/assets/login/background.png");
-  background-color: #000000CC;
-  background-blend-mode: color;
-  background-size: cover;
-  background-position: left;
+  background-color: #01030AFF;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
 }
 
 .room {

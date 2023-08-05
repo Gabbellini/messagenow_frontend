@@ -15,12 +15,12 @@ export default defineComponent({
   name: "MessageForm",
   props: {
     roomID: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
 
-  setup() {
+  setup(props) {
     const store = useStore();
 
     const text = ref("");
@@ -29,12 +29,13 @@ export default defineComponent({
         await sendMessage();
       } catch (e) {
         console.log("[onSubmit] Error sendMessage ", e);
+        alert(e);
       }
     };
 
     const sendMessage = async (): Promise<void> => {
       try {
-        await store.dispatch("room_module/sendMessage", text);
+        await store.dispatch("room_module/sendMessage", {roomID: props.roomID, text: text});
       } catch (e) {
         console.log("[onSubmit] Error dispatch ", e);
       }
@@ -64,10 +65,12 @@ fieldset {
   gap: 1rem;
   box-sizing: border-box;
   box-shadow: -4px -2px 4px rgba(0, 0, 0, 0.1);
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .input--submit {
-  background: #532dff;
+  background: #33b050;
   color: #fff;
   min-width: 100px;
   cursor: pointer;
@@ -77,7 +80,7 @@ fieldset {
 
 .input--message {
   flex: 1;
-  border: 1px solid rgba(255 255 255 / 10%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255 255 255 / 3%);
   color: #fff;
   padding: 1rem;

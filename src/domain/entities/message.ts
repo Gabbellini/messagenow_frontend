@@ -4,5 +4,7 @@ export type Message = {
     name: string,
     image: string,
   },
+
   text: string,
+  createdAt: string,
 }

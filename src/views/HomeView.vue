@@ -2,7 +2,7 @@
   <div class="home">
     <ContainerView class="container-view">
       <RoomList/>
-      <RoomView :room-i-d="roomID" v-if="roomID"/>
+      <MessageView :room-i-d="roomID"/>
     </ContainerView>
   </div>
 </template>
@@ -11,11 +11,11 @@
 import ContainerView from "@/components/ContainerView.vue";
 import {defineComponent} from "vue";
 import RoomList from "@/components/RoomList.vue";
-import RoomView from "@/components/Room.vue";
+import MessageView from "@/components/MessageView.vue";
 
 export default defineComponent({
   name: 'HomeView',
-  components: {RoomView, RoomList, ContainerView},
+  components: {MessageView, RoomList, ContainerView},
   props: {
     roomID: {
       required: true,
@@ -40,6 +40,8 @@ export default defineComponent({
   height: 800px;
   padding: 0;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+  background: url("../assets/login/background.png") no-repeat;
+  background-size: cover;
 }
 
 .form__container > h1 {
@@ -50,5 +52,9 @@ export default defineComponent({
 
 .form__container > h1 > strong {
   font-weight: bold;
+}
+
+.home__messages {
+  flex: 1;
 }
 </style>

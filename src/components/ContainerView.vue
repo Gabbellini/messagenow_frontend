@@ -16,5 +16,7 @@ export default {
   max-width: 1360px;
   width: 100%;
   box-sizing: border-box;
+  border-radius: 10px;
+  overflow: hidden;
 }
 </style>
