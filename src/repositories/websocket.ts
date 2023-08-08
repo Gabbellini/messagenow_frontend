@@ -1,21 +1,34 @@
 export type WebSocketData = string | ArrayBufferLike | Blob | ArrayBufferView
 
-export class MessageWebSocketImpl {
-  private static websocket: WebSocket | null;
+export interface WebSocketObserver {
+  onmessage(messageEvent: MessageEvent): any
+}
 
-  private constructor() {
-    return;
+export interface MessageWebsocket {
+  subscribe(observer: WebSocketObserver): void
+  send(data: WebSocketData): void
+}
+
+export class IMessageWebSocket implements MessageWebsocket {
+  private webSocket: WebSocket | null;
+  private observers: WebSocketObserver[] = [];
+
+  constructor(url: string) {
+    this.webSocket = new WebSocket(url);
+    this.webSocket.onmessage = this.onmessage;
   }
 
-  public static getInstance(url: string): WebSocket {
-    if (!this.websocket) {
-      this.websocket = new WebSocket(url);
+  public send(data: WebSocketData): void {
+    this.webSocket?.send(data);
+  }
+
+  public subscribe(observer: WebSocketObserver): void {
+    this.observers.push(observer);
+  }
+
+  public onmessage(messageEvent: MessageEvent): void {
+    for (const observer of this.observers) {
+      observer.onmessage(messageEvent);
     }
-    return this.websocket;
-  }
-
-  public static send(data: WebSocketData): void {
-    console.log(data);
-    MessageWebSocketImpl.websocket?.send(data);
   }
 }

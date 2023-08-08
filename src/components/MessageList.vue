@@ -45,6 +45,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       try {
         await loadMessages();
+        startWebSocket();
       } catch (e) {
         console.log("[onMounted] Error ", e);
       }
@@ -55,6 +56,15 @@ export default defineComponent({
         await store.dispatch("room_module/loadMessages", parseInt(props.roomID));
       } catch (e) {
         console.log("[loadMessages] Error dispatch ", e);
+        throw e;
+      }
+    };
+
+    const startWebSocket = (): void => {
+      try {
+        store.dispatch("room_module/startWebsocket", parseInt(props.roomID));
+      } catch (e) {
+        console.log("[startWebSocket] Error dispatch ", e);
         throw e;
       }
     };
