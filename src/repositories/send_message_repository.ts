@@ -1,14 +1,13 @@
-import {User} from "@/domain/entities/user";
-import {http} from "@/repositories/http";
+import {MessageWebSocketImpl, WebSocketData} from "@/repositories/websocket";
 
 interface SendMessageRepository {
-  Execute(roomID: number, message: string): Promise<User>
+  Execute(message: WebSocketData): void
 }
 
 class SendMessageRepositoryImpl implements SendMessageRepository {
-  Execute(roomID: number, message: string): Promise<User> {
+  Execute(data: WebSocketData): void {
     try {
-      return http.post(`/rooms/${roomID}/ws`, message);
+      MessageWebSocketImpl.send(data);
     } catch (e) {
       console.log("[SendMessageRepositoryImpl] Error Execute ", e);
       throw e;

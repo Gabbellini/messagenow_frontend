@@ -1,5 +1,3 @@
-import {http} from "@/repositories/http";
-import {Room} from "@/domain/entities/room";
 import {Message} from "@/domain/entities/message";
 import {loadMessagesRepository} from "@/repositories/load_messages_repository";
 

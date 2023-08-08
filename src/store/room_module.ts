@@ -4,7 +4,8 @@ import {loadRoomsUseCase} from "@/usecases/load_rooms_usecase";
 import {loadMessagesUseCase} from "@/usecases/load_messages_usecase";
 import {Message} from "@/domain/entities/message";
 import {sendMessageUseCase} from "@/usecases/send_message_usecase";
-import MessageBox from "@/components/MessageBox.vue";
+import {WebSocketData} from "@/repositories/websocket";
+import {startMessageWebSocketUseCase} from "@/usecases/start_message_websocket_usecase";
 
 class RoomState {
   rooms: Room[] = [];
@@ -26,7 +27,7 @@ const mutations = {
 const actions = {
   loadRooms: async ({commit}: ActionContext<RoomState, RoomState>) => {
     try {
-      const rooms: Room[] = await loadRooms();
+      const rooms: Room[] = await loadRoomsUseCase.Execute();
       commit("SET_ROOMS", rooms);
     } catch (e) {
       console.log("[actions] Error loadRooms ", e);
@@ -36,7 +37,7 @@ const actions = {
 
   loadMessages: async ({commit}: ActionContext<RoomState, RoomState>, roomID: number): Promise<void> => {
     try {
-      const messages = await loadMessages(roomID);
+      const messages = await loadMessagesUseCase.Execute(roomID);
       commit("SET_ROOM_MESSAGES", messages);
     } catch (e) {
       console.log("[actions] Error loadMessages ", e);
@@ -44,44 +45,14 @@ const actions = {
     }
   },
 
-  sendMessage: async ({commit}: ActionContext<RoomState, RoomState>, {
-    roomID,
-    message
-  }: { roomID: number, message: string }): Promise<void> => {
+  sendMessage: async (ctx: ActionContext<RoomState, RoomState>, data: WebSocketData): Promise<void> => {
     try {
-      await sendMessage(roomID, message);
+      await sendMessageUseCase.Execute(data);
     } catch (e) {
       console.log("[actions] Error sendMessage ", e);
       throw e;
     }
   },
-};
-
-const loadRooms = async (): Promise<Room[]> => {
-  try {
-    return await loadRoomsUseCase.Execute();
-  } catch (e) {
-    console.log("[actions] Error loadRoomsUseCase ", e)
-    throw e;
-  }
-};
-
-const loadMessages = async (roomID: number): Promise<Message[]> => {
-  try {
-    return await loadMessagesUseCase.Execute(roomID);
-  } catch (e) {
-    console.log("[actions] Error loadMessagesUseCase ", e)
-    throw e;
-  }
-};
-
-const sendMessage = async (roomID: number, message: string): Promise<void> => {
-  try {
-    await sendMessageUseCase.Execute(roomID, message);
-  } catch (e) {
-    console.log("[actions] Error sendMessageUseCase ", e)
-    throw e;
-  }
 };
 
 const getters = {

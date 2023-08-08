@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit">
     <fieldset>
-      <input class="input input--message" type="text" id="message">
+      <input class="input input--message" type="text" id="message" v-model="text">
       <input class="input input--submit" type="submit"/>
     </fieldset>
   </form>
@@ -13,14 +13,7 @@ import {useStore} from "vuex";
 
 export default defineComponent({
   name: "MessageForm",
-  props: {
-    roomID: {
-      type: String,
-      required: true,
-    },
-  },
-
-  setup(props) {
+  setup() {
     const store = useStore();
 
     const text = ref("");
@@ -35,9 +28,10 @@ export default defineComponent({
 
     const sendMessage = async (): Promise<void> => {
       try {
-        await store.dispatch("room_module/sendMessage", {roomID: props.roomID, message: text});
+        await store.dispatch("room_module/sendMessage", text.value);
       } catch (e) {
         console.log("[onSubmit] Error dispatch ", e);
+        throw e;
       }
     };
 

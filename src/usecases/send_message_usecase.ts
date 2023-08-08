@@ -1,16 +1,16 @@
-import {User} from "@/domain/entities/user";
 import {sendMessageRepository} from "@/repositories/send_message_repository";
+import {WebSocketData} from "@/repositories/websocket";
 
 interface SendMessageUseCase {
-  Execute(roomID: number, message: string): Promise<User>
+  Execute(message: WebSocketData): void
 }
 
 class SendMessageUseCaseImpl implements SendMessageUseCase {
-  Execute(roomID: number, message: string): Promise<User> {
+  Execute(data: WebSocketData): void {
     try {
-      return sendMessageRepository.Execute(roomID, message);
+      return sendMessageRepository.Execute(data);
     } catch (e) {
-      console.log("[SendMessageUseCaseImpl] Error Execute ", e);
+      console.log("[SendMessageUseCaseImpl] Error sendMessageRepository ", e);
       throw e;
     }
   }

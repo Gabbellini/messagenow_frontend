@@ -51,12 +51,17 @@ export default defineComponent({
     });
 
     const loadMessages = async (): Promise<void> => {
-      await store.dispatch("room_module/loadMessages", parseInt(props.roomID))
+      try {
+        await store.dispatch("room_module/loadMessages", parseInt(props.roomID));
+      } catch (e) {
+        console.log("[loadMessages] Error dispatch ", e);
+        throw e;
+      }
     };
 
     const user: ComputedRef<User> = computed(() => store.getters["authorization_module/user"]);
-
     const messages: ComputedRef<Message[]> = computed(() => store.getters["room_module/messages"]);
+
     return {
       user,
       messages

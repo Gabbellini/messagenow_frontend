@@ -1,7 +1,7 @@
 <template>
   <div class="message-view" v-if="roomID">
     <MessageList class="message-view__list" :room-i-d="roomID"/>
-    <MessageForm class="message-view__form" :room-i-d="roomID"/>
+    <MessageForm class="message-view__form"/>
   </div>
   <div class="message-view message-view--fallback" v-else></div>
 </template>
