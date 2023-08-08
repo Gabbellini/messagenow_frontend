@@ -1,5 +1,5 @@
 <template>
-  <ul class="message-list">
+  <ul class="message-list" ref="messageListRef">
     <li
         v-for="(message, index) of messages"
         :key="`message-${index}`"
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted} from "vue";
+import {computed, defineComponent, onMounted, ref, watch} from "vue";
 import {ComputedRef} from "vue";
 import {Message} from "@/domain/entities/message";
 import {useStore} from "vuex";
@@ -41,11 +41,12 @@ export default defineComponent({
 
   setup(props) {
     const store = useStore();
+    const messageListRef = ref(null);
 
     onMounted(async (): Promise<void> => {
       try {
         await loadMessages();
-        startWebSocket();
+        await startWebSocket();
       } catch (e) {
         console.log("[onMounted] Error ", e);
       }
@@ -60,9 +61,9 @@ export default defineComponent({
       }
     };
 
-    const startWebSocket = (): void => {
+    const startWebSocket = async (): Promise<void> => {
       try {
-        store.dispatch("room_module/startWebsocket", parseInt(props.roomID));
+        await store.dispatch("room_module/startWebsocket", parseInt(props.roomID));
       } catch (e) {
         console.log("[startWebSocket] Error dispatch ", e);
         throw e;
@@ -72,7 +73,14 @@ export default defineComponent({
     const user: ComputedRef<User> = computed(() => store.getters["authorization_module/user"]);
     const messages: ComputedRef<Message[]> = computed(() => store.getters["room_module/messages"]);
 
+    watch(() => messages.value, () => {
+      if (!messageListRef.value) return;
+      const el = messageListRef.value as HTMLUListElement;
+      el.scrollTo(0, el.scrollHeight);
+    }, {deep: true, immediate: true});
+
     return {
+      messageListRef,
       user,
       messages
     }

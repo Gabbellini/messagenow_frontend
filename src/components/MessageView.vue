@@ -32,5 +32,6 @@ export default defineComponent({
 
 .message-view__list {
   flex: 1;
+  overflow: auto;
 }
 </style>

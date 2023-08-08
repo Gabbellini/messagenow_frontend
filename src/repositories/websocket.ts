@@ -11,11 +11,13 @@ export interface MessageWebsocket {
 
 export class IMessageWebSocket implements MessageWebsocket {
   private webSocket: WebSocket | null;
-  private observers: WebSocketObserver[] = [];
+  private readonly observers: WebSocketObserver[] = [];
 
   constructor(url: string) {
     this.webSocket = new WebSocket(url);
-    this.webSocket.onmessage = this.onmessage;
+    this.webSocket.onmessage = (e) => {
+      this.onmessage(e);
+    };
   }
 
   public send(data: WebSocketData): void {
@@ -27,8 +29,8 @@ export class IMessageWebSocket implements MessageWebsocket {
   }
 
   public onmessage(messageEvent: MessageEvent): void {
-    for (const observer of this.observers) {
+    this.observers.forEach((observer) => {
       observer.onmessage(messageEvent);
-    }
+    });
   }
 }

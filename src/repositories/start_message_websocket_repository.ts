@@ -7,7 +7,7 @@ interface StartMessageWebsocketRepository {
 
 class StartMessageWebsocketRepositoryImpl implements StartMessageWebsocketRepository {
   Execute(roomID: number): MessageWebsocket {
-    return new IMessageWebSocket(`ws://${apiDomain}/rooms/${roomID}/ws`)
+    return new IMessageWebSocket(`ws://${apiDomain}/rooms/${roomID}/ws`);
   }
 }
 
