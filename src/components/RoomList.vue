@@ -1,6 +1,7 @@
 <template>
   <ol class="rooms">
-    <li @click="onClick(room)" class="room" v-for="(room, index) of rooms" :key="`room-${index}`">
+    <li @click="onClick(room)" :class="['room', {active: room.id === parseInt(roomID)}]" v-for="(room, index) of rooms"
+        :key="`room-${index}`">
       <h2>Participantes</h2>
       <ul class="room__users">
         <li class="room__user" v-for="(user, index) of room.users" :key="`user-${index}`">
@@ -19,6 +20,12 @@ import {useRouter} from "vue-router";
 
 export default defineComponent({
   name: "RoomList",
+  props: {
+    roomID: {
+      type: String,
+      required: true,
+    },
+  },
 
   setup() {
     const store = useStore();
@@ -86,6 +93,8 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  font-size: 0.8rem;
+
 }
 
 .room > h2 {
@@ -93,7 +102,8 @@ export default defineComponent({
   margin-bottom: 0.4rem;
 }
 
-.room__users {
-  font-size: 0.8rem;
+.room.active {
+    background: #3378b0;
 }
+
 </style>

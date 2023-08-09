@@ -20,6 +20,7 @@ export default defineComponent({
     const onSubmit = async () => {
       try {
         await sendMessage();
+        text.value = "";
       } catch (e) {
         console.log("[onSubmit] Error sendMessage ", e);
         alert(e);
@@ -34,6 +35,7 @@ export default defineComponent({
         throw e;
       }
     };
+
 
     return {
       text,

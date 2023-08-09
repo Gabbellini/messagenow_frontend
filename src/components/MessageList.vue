@@ -61,6 +61,8 @@ export default defineComponent({
       }
     };
 
+    watch(() => props.roomID, loadMessages);
+
     const startWebSocket = async (): Promise<void> => {
       try {
         await store.dispatch("room_module/startWebsocket", parseInt(props.roomID));
@@ -76,7 +78,7 @@ export default defineComponent({
     watch(() => messages.value, () => {
       if (!messageListRef.value) return;
       const el = messageListRef.value as HTMLUListElement;
-      el.scrollTo(0, el.scrollHeight);
+      setTimeout(() => el.scrollTo(0, el.scrollHeight), 100);
     }, {deep: true, immediate: true});
 
     return {

@@ -71,7 +71,7 @@ const actions = {
 
   loadMessages: async ({commit}: ActionContext<RoomState, RoomState>, roomID: number): Promise<void> => {
     try {
-      const messages = await loadMessagesUseCase.Execute(roomID);
+      const messages = (await loadMessagesUseCase.Execute(roomID) ?? []);
       commit("SET_ROOM_MESSAGES", messages);
     } catch (e) {
       console.log("[actions] Error loadMessages ", e);

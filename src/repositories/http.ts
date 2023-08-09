@@ -1,7 +1,7 @@
 import axios from "axios";
 import router from "@/router";
 
-export const apiDomain = "localhost:8080/api";
+export const apiDomain = "10.0.11.140:8080/api";
 export const http = axios.create({
   baseURL: `http://${apiDomain}`,
   withCredentials: true,

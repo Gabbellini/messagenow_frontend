@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <ContainerView class="container-view">
-      <RoomList/>
+      <RoomList :room-i-d="roomID"/>
       <MessageView :room-i-d="roomID"/>
     </ContainerView>
   </div>
