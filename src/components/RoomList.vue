@@ -27,13 +27,14 @@ export default defineComponent({
     },
   },
 
-  setup() {
+  setup(props) {
     const store = useStore();
     const router = useRouter();
 
     onMounted(async (): Promise<void> => {
       try {
         await loadRooms();
+        if (props.roomID) await setCurrentRoom(parseInt(props.roomID));
       } catch (e) {
         console.log("[loadRooms] Error dispatch ", e);
         alert(e);
@@ -55,11 +56,27 @@ export default defineComponent({
     const onClick = async (room: Room): Promise<void> => {
       try {
         await router.push({name: "rooms", params: {roomID: room.id}});
+        await setCurrentRoom(room.id);
       } catch (e) {
         console.log("[onClick] Error loadRoom ", e);
         alert(e);
       }
     };
+
+    const setCurrentRoom = async (roomID: number): Promise<void> => {
+      try {
+        const room = getRoomByID(roomID);
+        if (!room) return;
+        await store.dispatch("room_module/setCurrentRoom", room);
+      } catch (e) {
+        console.log("[setCurrentRoom] Error dispatch ", e);
+        throw e;
+      }
+    };
+
+    const getRoomByID = (roomID: number): Room | undefined => {
+      return rooms.value.find((room) => room.id == roomID);
+    }
 
     return {
       rooms,
@@ -103,7 +120,7 @@ export default defineComponent({
 }
 
 .room.active {
-    background: #3378b0;
+  background: #3378b0;
 }
 
 </style>

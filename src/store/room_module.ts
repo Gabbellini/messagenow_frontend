@@ -8,10 +8,10 @@ import {startMessageWebSocketUseCase} from "@/usecases/start_message_websocket_u
 
 class RoomState {
   rooms: Room[] = [];
-  messages: Message[] = [];
+  currentRoom: Room | null = null;
+  roomMessages: Map<number, Message[] | null> = new Map();
   webSocket: MessageWebsocket | null = null;
 }
-
 
 const state = new RoomState();
 
@@ -24,12 +24,16 @@ const mutations = {
     state.rooms = rooms;
   },
 
-  SET_ROOM_MESSAGES(state: RoomState, messages: Message[]): void {
-    state.messages = messages;
+  SET_CURRENT_ROOM(state: RoomState, room: Room): void {
+    state.currentRoom = room;
   },
 
-  ADD_ROOM_MESSAGE(state: RoomState, message: Message): void {
-    state.messages.push(message);
+  SET_ROOM_MESSAGES(state: RoomState, {roomID, messages}: { roomID: number, messages: Message[] }): void {
+    state.roomMessages.set(roomID, messages);
+  },
+
+  ADD_ROOM_MESSAGE(state: RoomState, {roomID, message}: { roomID: number, message: Message }): void {
+    state.roomMessages?.get(roomID)?.push(message);
   },
 };
 
@@ -37,9 +41,9 @@ class RoomObserver implements WebSocketObserver {
   private ctx: ActionContext<RoomState, RoomState>
 
   onmessage(messageEvent: MessageEvent): any {
-    console.log(JSON.parse(messageEvent.data))
-    const {sender, text, createdAt} = JSON.parse(messageEvent.data);
-    this.ctx.commit("ADD_ROOM_MESSAGE", new Message(sender, text, createdAt));
+    const {roomID, sender, text, createdAt} = JSON.parse(messageEvent.data);
+    const message = new Message(sender, text, createdAt);
+    this.ctx.commit("ADD_ROOM_MESSAGE", {roomID, message});
   }
 
   constructor(ctx: ActionContext<RoomState, RoomState>) {
@@ -48,9 +52,11 @@ class RoomObserver implements WebSocketObserver {
 }
 
 const actions = {
-  startWebsocket: (ctx: ActionContext<RoomState, RoomState>, roomID: number) => {
+  startWebsocket: (ctx: ActionContext<RoomState, RoomState>) => {
     try {
-      const messageWebSocket = startMessageWebSocketUseCase.Execute(roomID);
+      const currentRoom = ctx.state.currentRoom;
+      if (!currentRoom) return;
+      const messageWebSocket = startMessageWebSocketUseCase.Execute(currentRoom.id);
       messageWebSocket.subscribe(new RoomObserver(ctx))
       ctx.commit("SET_WEBSOCKET", messageWebSocket);
     } catch (e) {
@@ -69,10 +75,21 @@ const actions = {
     }
   },
 
-  loadMessages: async ({commit}: ActionContext<RoomState, RoomState>, roomID: number): Promise<void> => {
+  setCurrentRoom: async (ctx: ActionContext<RoomState, RoomState>, room: Room) => {
     try {
-      const messages = (await loadMessagesUseCase.Execute(roomID) ?? []);
-      commit("SET_ROOM_MESSAGES", messages);
+      ctx.commit("SET_CURRENT_ROOM", room);
+    } catch (e) {
+      console.log("[actions] Error setCurrentRoom ", e);
+      throw e;
+    }
+  },
+
+  loadMessages: async (ctx: ActionContext<RoomState, RoomState>): Promise<void> => {
+    try {
+      const room = ctx.state.currentRoom;
+      if (!room) return;
+      const messages = (await loadMessagesUseCase.Execute(room.id) ?? []);
+      ctx.commit("SET_ROOM_MESSAGES", {roomID: room.id, messages});
     } catch (e) {
       console.log("[actions] Error loadMessages ", e);
       throw e;
@@ -81,6 +98,7 @@ const actions = {
 
   sendMessage: async (ctx: ActionContext<RoomState, RoomState>, data: WebSocketData): Promise<void> => {
     try {
+      console.log(ctx.state.webSocket)
       ctx.state.webSocket?.send(data);
     } catch (e) {
       console.log("[actions] Error sendMessage ", e);
@@ -91,7 +109,18 @@ const actions = {
 
 const getters = {
   rooms: (state: RoomState): Room[] => state.rooms,
-  messages: (state: RoomState): Message[] => state.messages,
+  currentRoom: (state: RoomState): Room | null => state.currentRoom,
+  messages: (state: RoomState): Message[] | null => {
+    const currentRoom = state.currentRoom;
+    const messages: Message[] = [];
+    console.log(currentRoom);
+    if (!currentRoom) return messages;
+
+    console.log("state.roomMessages", state.roomMessages)
+    console.log("state.roomMessages[roomID]", state.roomMessages?.get(currentRoom.id))
+
+    return state.roomMessages?.get(currentRoom.id) || messages;
+  },
 };
 
 export default {

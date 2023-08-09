@@ -22,7 +22,6 @@ export default defineComponent({
       type: String,
     }
   },
-
 });
 </script>
 

@@ -28,25 +28,20 @@ import {Message} from "@/domain/entities/message";
 import {useStore} from "vuex";
 import MessageBox from "@/components/MessageBox.vue";
 import {User} from "@/domain/entities/user";
+import {Room} from "@/domain/entities/room";
 
 export default defineComponent({
   name: "MessageList",
   components: {MessageBox},
-  props: {
-    roomID: {
-      type: String,
-      required: true
-    },
-  },
 
-  setup(props) {
+  setup() {
     const store = useStore();
     const messageListRef = ref(null);
 
     onMounted(async (): Promise<void> => {
       try {
         await loadMessages();
-        await startWebSocket();
+        await updateWebSocketConnection();
       } catch (e) {
         console.log("[onMounted] Error ", e);
       }
@@ -54,26 +49,30 @@ export default defineComponent({
 
     const loadMessages = async (): Promise<void> => {
       try {
-        await store.dispatch("room_module/loadMessages", parseInt(props.roomID));
+        await store.dispatch("room_module/loadMessages");
       } catch (e) {
         console.log("[loadMessages] Error dispatch ", e);
         throw e;
       }
     };
 
-    watch(() => props.roomID, loadMessages);
-
-    const startWebSocket = async (): Promise<void> => {
+    const updateWebSocketConnection = async (): Promise<void> => {
       try {
-        await store.dispatch("room_module/startWebsocket", parseInt(props.roomID));
+        await store.dispatch("room_module/startWebsocket");
       } catch (e) {
-        console.log("[startWebSocket] Error dispatch ", e);
+        console.log("[updateWebSocketConnection] Error dispatch ", e);
         throw e;
       }
     };
 
     const user: ComputedRef<User> = computed(() => store.getters["authorization_module/user"]);
-    const messages: ComputedRef<Message[]> = computed(() => store.getters["room_module/messages"]);
+    const currentRoom: ComputedRef<Room | null> = computed(() => store.getters["room_module/currentRoom"]);
+    const messages: ComputedRef<Message[] | null> = computed(() => store.getters["room_module/messages"]);
+
+    watch(() => currentRoom.value, () => {
+      updateWebSocketConnection();
+      loadMessages();
+    }, {deep: true, immediate: true});
 
     watch(() => messages.value, () => {
       if (!messageListRef.value) return;
