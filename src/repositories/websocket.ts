@@ -6,7 +6,10 @@ export interface WebSocketObserver {
 
 export interface MessageWebsocket {
   subscribe(observer: WebSocketObserver): void
+
   send(data: WebSocketData): void
+
+  close(): void
 }
 
 export class IMessageWebSocket implements MessageWebsocket {
@@ -32,5 +35,9 @@ export class IMessageWebSocket implements MessageWebsocket {
     this.observers.forEach((observer) => {
       observer.onmessage(messageEvent);
     });
+  }
+
+  close(): void {
+    this.webSocket?.close();
   }
 }

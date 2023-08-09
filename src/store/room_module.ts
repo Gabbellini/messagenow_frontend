@@ -9,7 +9,7 @@ import {startMessageWebSocketUseCase} from "@/usecases/start_message_websocket_u
 class RoomState {
   rooms: Room[] = [];
   currentRoom: Room | null = null;
-  roomMessages: Map<number, Message[] | null> = new Map();
+  roomMessages: Map<number, Message[]> = new Map();
   webSocket: MessageWebsocket | null = null;
 }
 
@@ -33,7 +33,7 @@ const mutations = {
   },
 
   ADD_ROOM_MESSAGE(state: RoomState, {roomID, message}: { roomID: number, message: Message }): void {
-    state.roomMessages?.get(roomID)?.push(message);
+    state.roomMessages.get(roomID)?.push(message);
   },
 };
 
@@ -43,6 +43,7 @@ class RoomObserver implements WebSocketObserver {
   onmessage(messageEvent: MessageEvent): any {
     const {roomID, sender, text, createdAt} = JSON.parse(messageEvent.data);
     const message = new Message(sender, text, createdAt);
+    console.log("NEW MESSAGE RECEIVED: ", message, "\nROOM: ", roomID, "\nFROM: ", sender);
     this.ctx.commit("ADD_ROOM_MESSAGE", {roomID, message});
   }
 
@@ -78,6 +79,7 @@ const actions = {
   setCurrentRoom: async (ctx: ActionContext<RoomState, RoomState>, room: Room) => {
     try {
       ctx.commit("SET_CURRENT_ROOM", room);
+      ctx.state.webSocket?.close();
     } catch (e) {
       console.log("[actions] Error setCurrentRoom ", e);
       throw e;
@@ -113,12 +115,7 @@ const getters = {
   messages: (state: RoomState): Message[] | null => {
     const currentRoom = state.currentRoom;
     const messages: Message[] = [];
-    console.log(currentRoom);
     if (!currentRoom) return messages;
-
-    console.log("state.roomMessages", state.roomMessages)
-    console.log("state.roomMessages[roomID]", state.roomMessages?.get(currentRoom.id))
-
     return state.roomMessages?.get(currentRoom.id) || messages;
   },
 };
